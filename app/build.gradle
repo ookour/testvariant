@@ -1,0 +1,115 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+ext {
+    MOE_KEYSTORE_PATH = "app/src/moe/keystore/keystore.properties"
+    CC_KEYSTORE_PATH = "app/src/cc/keystore/keystore.properties"
+    MOEG_KEYSTORE_PATH = "app/src/moeg/keystore/keystore.properties"
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.example.testvariant"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        releaseMoe {
+            def keystorePropertiesFile = rootProject.file(MOE_KEYSTORE_PATH)
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+
+        releaseCc {
+            def keystorePropertiesFile = rootProject.file(CC_KEYSTORE_PATH)
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+
+        releaseMoeg {
+            def keystorePropertiesFile = rootProject.file(MOEG_KEYSTORE_PATH)
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    flavorDimensions "client", "environment"
+    productFlavors {
+        moe {
+            dimension "client"
+            applicationId 'com.example.testvariant.moe'
+        }
+        cc {
+            dimension "client"
+            applicationId 'com.example.testvariant.citycenter'
+        }
+        moeg {
+            dimension "client"
+            applicationId 'com.example.testvariant.moeg'
+        }
+        dev {
+            dimension "environment"
+        }
+
+        beta {
+            dimension "environment"
+        }
+
+        prod {
+            dimension "environment"
+        }
+
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            versionNameSuffix '-debug'
+            debuggable true
+            shrinkResources false
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            productFlavors.moe.signingConfig signingConfigs.releaseMoe
+            productFlavors.cc.signingConfig signingConfigs.releaseCc
+            productFlavors.moeg.signingConfig signingConfigs.releaseMoeg
+        }
+
+    }
+
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
